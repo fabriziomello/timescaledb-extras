@@ -171,7 +171,8 @@ SELECT
     pid,
     wait_event,
     application_name,
-    (now() - xact_start)::interval(0) AS xact_age
+    (now() - xact_start)::interval(0) AS xact_age,
+    (now() - backend_start)::interval(0) AS backend_age
 FROM
     pg_stat_activity
 WHERE

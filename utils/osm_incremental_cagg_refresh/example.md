@@ -3,8 +3,8 @@
 SELECT
     add_job(
         '_timescaledb_additional.task_refresh_continuous_aggregate_incremental_runner',
-        '1 minute',
-        config => '{"enable_tiered_reads": true}'
+        '5 seconds',
+        config => '{"enable_tiered_reads": true, "max_runtime": "5 minutes"}'
     )
 FROM
     generate_series(1, 4);

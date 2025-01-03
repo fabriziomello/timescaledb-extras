@@ -10,6 +10,7 @@ DECLARE
     global_end_time timestamptz;
     app_name text;
     n_jobs_left int;
+    p_job_id int := job_id;
 BEGIN
     max_runtime := coalesce(max_runtime, interval '1 hours');
     global_end_time := global_start_time + max_runtime;
@@ -37,25 +38,17 @@ BEGIN
             p_cagg regclass;
             p_window_start timestamptz;
             p_window_end timestamptz;
-            p_start_time timestamptz;
-            p_end_time timestamptz;
-            p_mat_hypertable_id int;
-            p_job_id int;
         BEGIN
             SELECT
                 q.id,
                 q.continuous_aggregate,
                 q.window_start,
-                q.window_end,
-                cagg.mat_hypertable_id,
-                coalesce(jobs.job_id, -1)
+                q.window_end
             INTO
                 p_id,
                 p_cagg,
                 p_window_start,
-                p_window_end,
-                p_mat_hypertable_id,
-                p_job_id
+                p_window_end
             FROM
                 _timescaledb_additional.incremental_continuous_aggregate_refreshes AS q
             JOIN
@@ -192,7 +185,7 @@ BEGIN
         finished IS NULL;
 
     IF n_jobs_left = 0 THEN
-        PERFORM alter_job(job_id, scheduled => false);
+        PERFORM public.alter_job(p_job_id, scheduled => false);
     END IF;
 
     RAISE NOTICE 'Shutting down worker, as we exceeded our maximum runtime (%)', max_runtime;
