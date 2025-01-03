@@ -189,8 +189,7 @@ BEGIN
     FROM
         _timescaledb_additional.incremental_continuous_aggregate_refreshes
     WHERE
-        started IS NOT NULL
-        AND finished IS NOT NULL;
+        finished IS NULL;
 
     IF n_jobs_left = 0 THEN
         PERFORM alter_job(job_id, scheduled => false);
